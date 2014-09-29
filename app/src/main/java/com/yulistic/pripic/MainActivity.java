@@ -15,6 +15,7 @@ import android.os.Build;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 
 public class MainActivity extends Activity {
@@ -51,6 +52,12 @@ public class MainActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void onSyncButtonClick(View view) {
+        //TODO Sync with server using multi thread.
+        Toast.makeText(this, "sync now!!", Toast.LENGTH_SHORT).show();
+    }
+
 
     /**
      * A placeholder fragment containing a simple view.
