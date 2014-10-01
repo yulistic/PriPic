@@ -42,7 +42,7 @@ public class PhotoContentProvider extends ContentProvider {
 
     private static final String DBNAME = "photodb";
     private static final String TABLE_NAME = "photos";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private SQLiteDatabase db;
 
 
@@ -153,9 +153,10 @@ public class PhotoContentProvider extends ContentProvider {
     }
 
 
-    public static final String COLUMN_ID = "_ID";
+    public static final String COLUMN_ID = "_id";
     public static final String COLUMN_ORIGINAL_PATH = "original_path";
     public static final String COLUMN_PRIV_PATH = "priv_path";
+    public static final String COLUMN_THUMBNAIL = "thumbnail";
 
 
     private static final String SQL_CREATE_PHOTOS = "CREATE TABLE " +
@@ -163,7 +164,8 @@ public class PhotoContentProvider extends ContentProvider {
             " (" +                           // The columns in the table
             " "+ COLUMN_ID +" INTEGER PRIMARY KEY, " +
             " " + COLUMN_ORIGINAL_PATH + " TEXT," +
-            " " + COLUMN_PRIV_PATH + " TEXT" +
+            " " + COLUMN_PRIV_PATH + " TEXT," +
+            " " + COLUMN_THUMBNAIL + " BLOB" +
             ")";
 
     protected static final class PhotoDatabaseHelper extends SQLiteOpenHelper {

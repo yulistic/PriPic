@@ -1,21 +1,30 @@
 package com.yulistic.pripic;
 
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ResourceCursorAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
+
+import java.util.ResourceBundle;
 
 
 public class MainActivity extends Activity {
@@ -29,6 +38,7 @@ public class MainActivity extends Activity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+
     }
 
 
@@ -62,7 +72,10 @@ public class MainActivity extends Activity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class PlaceholderFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+        //Loader id.
+        private static final int PHOTO_LOADER = 0;
+        ImageAdapter photoAdapter;
 
         public PlaceholderFragment() {
         }
@@ -70,28 +83,81 @@ public class MainActivity extends Activity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
+
+            /* CursorLoader initialization.*/
+            getLoaderManager().initLoader(PHOTO_LOADER, null, this);
+
+
             View rootView = inflater.inflate(R.layout.fragment_photo_list, container, false);
             return rootView;
+
         }
 
         @Override
         public void onActivityCreated(Bundle savedInstanceState){
             super.onActivityCreated(savedInstanceState);
 
-            GridView gridView = (GridView) getActivity().findViewById(R.id.fragment_photo_list_grid);
-            gridView.setAdapter(new ImageAdapter(getActivity()));
+            GridView mGridView = (GridView) getActivity().findViewById(R.id.fragment_photo_list_grid);
+            photoAdapter = new ImageAdapter(getActivity(), R.layout.gridview_item, null, 0);    //No FLAG_REGISTER_CONTENT_OBSERVER.
+            mGridView.setAdapter(photoAdapter);
+        }
 
+        @Override
+        public void onCreate(Bundle savedInstanceState){
+            super.onCreate(savedInstanceState);
+        }
+
+        /* LoadManager related implements. */
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+            switch(id){
+                case PHOTO_LOADER:
+                    String[] projection = null;
+                    String selection = null;
+                    String[] arguments = null;
+                    String sortOrder = null;
+
+                    return new CursorLoader(getActivity(),
+                            PhotoContentProvider.CONTENT_URI,
+                            projection,
+                            selection,
+                            arguments,
+                            sortOrder);
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+            photoAdapter.changeCursor(cursor);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> cursorLoader) {
+            photoAdapter.changeCursor(null);
         }
     }
 
-    public static class ImageAdapter extends BaseAdapter {
+    public static class ImageAdapter extends ResourceCursorAdapter {
         private Context mContext;
 
-        public ImageAdapter(Context c) {
-            mContext = c;
+        public ImageAdapter(Context context, int layout, Cursor c, int flags) {
+            super(context, layout, c, flags);
         }
 
-        public int getCount() {
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            ImageView iv = (ImageView) view.findViewById(R.id.id_gridview_item_imageview);
+            int photoColumnIndex = cursor.getColumnIndexOrThrow(PhotoContentProvider.COLUMN_THUMBNAIL);
+            byte[] thumbnailBytes = cursor.getBlob(photoColumnIndex);
+            Bitmap mThumbnailBitmap = BitmapFactory.decodeByteArray(thumbnailBytes, 0, thumbnailBytes.length);
+            iv.setImageBitmap(mThumbnailBitmap);
+        }
+
+
+
+        /*public int getCount() {
             return mThumbIds.length;
         }
 
@@ -117,11 +183,21 @@ public class MainActivity extends Activity {
 
             imageView.setImageResource(mThumbIds[position]);
             return imageView;
+        }*/
+
+        /*@Override
+        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+            return null;
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+
         }
 
         // references to our images
         private Integer[] mThumbIds = {
                 R.drawable.ic_launcher,R.drawable.ic_launcher,R.drawable.ic_launcher,R.drawable.ic_launcher
-        };
+        };*/
     }
 }
