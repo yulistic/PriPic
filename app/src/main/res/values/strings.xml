@@ -7,5 +7,7 @@
     <string name="title_activity_add_photo">AddPhotoActivity</string>
     <string name="progress_title">Now Sync...</string>
     <string name="progress_msg">Please wait a moment. It takes 5 seconds.</string>
+    <string name="syncservice_start">SyncService starting</string>
+    <string name="syncservice_done">SyncService done</string>
 
 </resources>

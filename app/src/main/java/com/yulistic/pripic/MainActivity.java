@@ -22,7 +22,12 @@ import android.widget.ImageView;
 import android.widget.ResourceCursorAdapter;
 
 
-
+/**
+ * MainActivity of the application (PriPic). It is composed of a Fragment that contains a GridView.
+ * In the GridView, photos that are saved in this application are listed. You can sync photos in your
+ * mobile device with your server by clicking Sync Button. When you click menu key, you can go into
+ * SettingsActivity.
+ */
 public class MainActivity extends Activity {
 
     @Override

@@ -6,8 +6,12 @@ import android.os.*;
 import android.os.Process;
 import android.widget.Toast;
 
+/**
+ * A Service that synchronizes photos in PhotoContentProvider with user's server.
+ * It uses a working thread for synchronizing. Also, it dismisses progressDialog in MainActivity
+ * when the sync job finishes.
+ */
 public class SyncService extends Service {
-    private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
 
     private final class ServiceHandler extends Handler {
@@ -25,6 +29,7 @@ public class SyncService extends Service {
                     try {
                         wait(endTime - System.currentTimeMillis());
                     } catch (Exception e) {
+                        // Interrupted Exception. Do nothing.
                     }
                 }
             }
@@ -37,23 +42,24 @@ public class SyncService extends Service {
         }
     }
 
-
     public SyncService() {
     }
 
     @Override
     public void onCreate(){
+        // A new thread that will do sync job.
         HandlerThread thread = new HandlerThread("SyncStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
 
-        mServiceLooper = thread.getLooper();
+        Looper mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler (mServiceLooper);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "SyncService starting", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.syncservice_start), Toast.LENGTH_SHORT).show();
 
+        // Send message to the handler.
         Message msg = mServiceHandler.obtainMessage();
         msg.arg1 = startId;
         mServiceHandler.sendMessage(msg);
@@ -68,6 +74,6 @@ public class SyncService extends Service {
 
     @Override
     public void onDestroy(){
-        Toast.makeText(this, "SyncService done.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.syncservice_done), Toast.LENGTH_SHORT).show();
     }
 }
