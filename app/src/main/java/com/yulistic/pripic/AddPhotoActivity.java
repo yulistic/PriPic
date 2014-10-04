@@ -37,7 +37,7 @@ public class AddPhotoActivity extends Activity {
 
                 // Get Thumbnail of the selected photo.
                 Bitmap thumbnailBitmap = MediaStore.Images.Thumbnails.getThumbnail(getContentResolver(),
-                        Integer.parseInt(imageUri.getLastPathSegment()), MediaStore.Images.Thumbnails.MINI_KIND, null);
+                        Long.parseLong(imageUri.getLastPathSegment()), MediaStore.Images.Thumbnails.MINI_KIND, null);
                 ByteArrayOutputStream blob = new ByteArrayOutputStream();
                 thumbnailBitmap.compress(Bitmap.CompressFormat.PNG, 0, blob);
                 byte[] bitmapData = blob.toByteArray();

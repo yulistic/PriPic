@@ -27,11 +27,13 @@ public class WifiStateReceiver extends BroadcastReceiver {
             //TODO start syncing. To be implemented.
             Toast.makeText(context, "wifi connected", Toast.LENGTH_SHORT).show();
             Log.e("PriPic", "Wifi has been connected.");
+            wifiConnected = true;
         }
         else if (wifiConnected && currentState == NetworkInfo.State.DISCONNECTED){
             //TODO stop syncing. To be implemented.
             Toast.makeText(context, "wifi disconnected", Toast.LENGTH_SHORT).show();
             Log.e("PriPic", "Wifi disconnected.");
+            wifiConnected = false;
         }
 
 

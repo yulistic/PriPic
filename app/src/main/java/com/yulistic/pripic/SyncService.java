@@ -57,7 +57,7 @@ public class SyncService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, getString(R.string.syncservice_start), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.sync_start), Toast.LENGTH_SHORT).show();
 
         // Send message to the handler.
         Message msg = mServiceHandler.obtainMessage();
@@ -74,6 +74,6 @@ public class SyncService extends Service {
 
     @Override
     public void onDestroy(){
-        Toast.makeText(this, getString(R.string.syncservice_done), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.sync_done), Toast.LENGTH_SHORT).show();
     }
 }
