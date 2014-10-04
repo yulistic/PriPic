@@ -31,12 +31,10 @@ public class AddPhotoActivity extends Activity {
         if (incomingAction.equals(Intent.ACTION_SEND)){
             Uri imageUri = (Uri) incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM);
             if (imageUri != null) {
-                //TODO make it private.
                 ContentValues values = new ContentValues();
                 values.put(PhotoContentProvider.COLUMN_ORIGINAL_PATH, imageUri.getPath());
 
                 // Get Thumbnail.
-                //TODO The parameter of getThumbnail: origid should be checked.
                 Bitmap thumbnailBitmap = MediaStore.Images.Thumbnails.getThumbnail(getContentResolver(),
                         Integer.parseInt(imageUri.getLastPathSegment()), MediaStore.Images.Thumbnails.MINI_KIND, (BitmapFactory.Options)null);
                 ByteArrayOutputStream blob = new ByteArrayOutputStream();
@@ -48,6 +46,7 @@ public class AddPhotoActivity extends Activity {
                 Log.d(getString(R.string.app_name), uri.toString() + " inserted.");
             }
             Toast.makeText(this, "Selected photo is saved in Pripic.", Toast.LENGTH_SHORT).show();
+
         }else if (incomingAction.equals(Intent.ACTION_SEND_MULTIPLE)){
             ArrayList<Uri> imageUris = incomingIntent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
             if (imageUris != null){

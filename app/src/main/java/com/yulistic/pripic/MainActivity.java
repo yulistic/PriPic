@@ -3,6 +3,7 @@ package com.yulistic.pripic;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -16,15 +17,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CursorAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ResourceCursorAdapter;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
-import java.util.ResourceBundle;
 
 
 public class MainActivity extends Activity {
@@ -38,7 +34,6 @@ public class MainActivity extends Activity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
-
     }
 
 
@@ -51,10 +46,9 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        // The case when Settings option is clicked. SettingsActivity will be started
+        // as the option is clicked.
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -63,14 +57,21 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    public static ProgressDialog progressDialog;
+
     public void onSyncButtonClick(View view) {
-        //TODO Sync with server using multi thread.
-        Toast.makeText(this, "sync now!!", Toast.LENGTH_SHORT).show();
+        // Create progress dialog.
+        progressDialog = ProgressDialog.show(this, getString(R.string.progress_title), getString(R.string.progress_msg), true);
+
+        // Start SyncService.
+        Intent intent = new Intent (this, SyncService.class);
+        startService(intent);
     }
 
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A placeholder fragment containing a <code>GridView</code> that display photo list.
      */
     public static class PlaceholderFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
         //Loader id.
@@ -87,16 +88,14 @@ public class MainActivity extends Activity {
             /* CursorLoader initialization.*/
             getLoaderManager().initLoader(PHOTO_LOADER, null, this);
 
-
-            View rootView = inflater.inflate(R.layout.fragment_photo_list, container, false);
-            return rootView;
-
+            return inflater.inflate(R.layout.fragment_photo_list, container, false);
         }
 
         @Override
         public void onActivityCreated(Bundle savedInstanceState){
             super.onActivityCreated(savedInstanceState);
 
+            // Link photoAdapter to gridview.
             GridView mGridView = (GridView) getActivity().findViewById(R.id.fragment_photo_list_grid);
             photoAdapter = new ImageAdapter(getActivity(), R.layout.gridview_item, null, 0);    //No FLAG_REGISTER_CONTENT_OBSERVER.
             mGridView.setAdapter(photoAdapter);
@@ -112,17 +111,12 @@ public class MainActivity extends Activity {
         public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
             switch(id){
                 case PHOTO_LOADER:
-                    String[] projection = null;
-                    String selection = null;
-                    String[] arguments = null;
-                    String sortOrder = null;
-
                     return new CursorLoader(getActivity(),
                             PhotoContentProvider.CONTENT_URI,
-                            projection,
-                            selection,
-                            arguments,
-                            sortOrder);
+                            null,
+                            null,
+                            null,
+                            null);
                 default:
                     return null;
             }
@@ -139,9 +133,10 @@ public class MainActivity extends Activity {
         }
     }
 
+    /**
+     * ImageAdapter which deals with ImageView containing a photo thumbnail.
+     */
     public static class ImageAdapter extends ResourceCursorAdapter {
-        private Context mContext;
-
         public ImageAdapter(Context context, int layout, Cursor c, int flags) {
             super(context, layout, c, flags);
         }
@@ -154,50 +149,5 @@ public class MainActivity extends Activity {
             Bitmap mThumbnailBitmap = BitmapFactory.decodeByteArray(thumbnailBytes, 0, thumbnailBytes.length);
             iv.setImageBitmap(mThumbnailBitmap);
         }
-
-
-
-        /*public int getCount() {
-            return mThumbIds.length;
-        }
-
-        public Object getItem(int position) {
-            return null;
-        }
-
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        // create a new ImageView for each item referenced by the Adapter
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
-            if (convertView == null) {  // if it's not recycled, initialize some attributes
-                imageView = new ImageView(mContext);
-                imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                imageView.setPadding(8, 8, 8, 8);
-            } else {
-                imageView = (ImageView) convertView;
-            }
-
-            imageView.setImageResource(mThumbIds[position]);
-            return imageView;
-        }*/
-
-        /*@Override
-        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-            return null;
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-
-        }
-
-        // references to our images
-        private Integer[] mThumbIds = {
-                R.drawable.ic_launcher,R.drawable.ic_launcher,R.drawable.ic_launcher,R.drawable.ic_launcher
-        };*/
     }
 }
